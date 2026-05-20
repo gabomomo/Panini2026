@@ -738,7 +738,6 @@
                 </div>
                 <div style={{ display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "flex-end" }}>
                   <button onClick={onShowInstallTip} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>📌 Guardar app</button>
-                  <button onClick={() => setScreen("missing")} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>📋 Ver lista completa</button>
                   <button onClick={() => setScreen("ranking")} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#ffd60a", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>🏆 Ranking</button>
                   <button onClick={onLogout} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>Salir</button>
                 </div>
@@ -772,8 +771,9 @@
           <div style={{ maxWidth: 700, margin: "0 auto", padding: "0 14px" }}>
             <div style={{ display: "flex", gap: 8, margin: "14px 0 12px" }}>
               {[["grupos", "⚽ GRUPOS (A–L)"], ["especial", "✨ ESPECIALES"]].map(([t, label]) => (
-                <button key={t} onClick={() => setTab(t)} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: tab === t ? "#f72585" : "rgba(255,255,255,0.06)", color: tab === t ? "#fff" : "rgba(255,255,255,0.45)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1, cursor: "pointer" }}>{label}</button>
+                <button key={t} onClick={() => { setTab(t); setScreen('main'); }} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: tab === t && screen === 'main' ? "#f72585" : "rgba(255,255,255,0.06)", color: tab === t && screen === 'main' ? "#fff" : "rgba(255,255,255,0.45)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1, cursor: "pointer" }}>{label}</button>
               ))}
+              <button onClick={() => setScreen('missing')} style={{ padding: "8px 18px", borderRadius: 999, border: "none", background: screen === 'missing' ? "#f72585" : "rgba(255,255,255,0.06)", color: screen === 'missing' ? "#fff" : "rgba(255,255,255,0.45)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 1, cursor: "pointer" }}>📋 Lista completa</button>
             </div>
 
             {tab === "grupos" && (<>
