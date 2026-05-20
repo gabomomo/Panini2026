@@ -339,7 +339,7 @@
             <h1 style={{ margin: "4px 0 0", fontSize: 28, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900 }}>
               WORLD CUP <span style={{ color: "#ffd60a" }}>2026™</span>
             </h1>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 6 }}>Tracker de figitas · {TOTAL} stickers</p>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 6 }}>Tracker de stickers · {TOTAL} stickers</p>
           </div>
 
           <div style={{ ...(shake ? { animation: "shake .4s" } : {}), width: "100%", display: "flex", justifyContent: "center" }}>
@@ -483,7 +483,7 @@
                     </div>
                     <Bar pct={u.pct} color={i === 0 ? "#ffd60a" : i === 1 ? "#bdbdbd" : i === 2 ? "#ff9800" : "#f72585"} />
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
-                      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{u.count} figitas</span>
+                      <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{u.count} stickers</span>
                       <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>{u.pct}%</span>
                     </div>
                   </div>
@@ -518,7 +518,7 @@
             <div>
               <div style={{ fontSize: 10, letterSpacing: 3, color: "#f72585", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700 }}>LISTADO COMPLETO</div>
               <h2 style={{ margin: 0, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 22 }}>Faltantes por equipo y grupo</h2>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 4 }}>{totalMissing} figitas faltantes</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 4 }}>{totalMissing} stickers faltantes</div>
             </div>
           </div>
           <div style={{ maxWidth: 700, margin: "0 auto", padding: "20px 14px", display: "grid", gap: 16 }}>
@@ -572,7 +572,7 @@
 
             {groups.length === 0 && special.length === 0 && (
               <div style={{ textAlign: "center", color: "rgba(255,255,255,0.4)", padding: 24, borderRadius: 14, background: "rgba(255,255,255,0.03)" }}>
-                No hay faltantes. ¡Completaste todas las figitas!
+                No hay faltantes. ¡Completaste todos los stickers!
               </div>
             )}
           </div>
@@ -648,7 +648,7 @@
                 <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 18, color }}>{pct}%</span>
               </div>
               <Bar pct={pct} color={color} />
-              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3, display: "block" }}>{tot}/{total} figitas</span>
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 3, display: "block" }}>{tot}/{total} stickers</span>
             </div>
           </div>
           <div style={{ padding: "10px", display: "flex", flexDirection: "column", gap: 6, background: "#0d0d1a" }}>
@@ -758,7 +758,7 @@
                 {[
                   { v: `${GROUPS.filter(g => g.teams.every(t => Array.from({ length: 20 }, (_, i) => `${t.id}${i + 1}`).every(k => !!owned[k]))).length}/12`, l: "Grupos" },
                   { v: ALL_TEAMS.filter(t => Array.from({ length: 20 }, (_, i) => `${t.id}${i + 1}`).every(k => !!owned[k])).length, l: "Equipos completos" },
-                  { v: totalOwned, l: "Figitas totales" },
+                  { v: totalOwned, l: "Stickers totales" },
                 ].map(s => (
                   <div key={s.l} style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "6px 8px", textAlign: "center" }}>
                     <div style={{ fontWeight: 900, fontSize: 15, fontFamily: "'Barlow Condensed',sans-serif" }}>{s.v}</div>
@@ -801,7 +801,7 @@
               </div>
             )}
             <div style={{ marginTop: 40, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,0.15)", lineHeight: 2 }}>
-              980 figitas · 48 selecciones · 12 grupos<br />Guardado en Supabase ☁️
+              980 stickers · 48 selecciones · 12 grupos<br />Guardado en Supabase ☁️
             </div>
           </div>
         </div>
