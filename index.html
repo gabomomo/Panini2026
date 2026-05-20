@@ -116,25 +116,6 @@
     const TOTAL = ALL_TEAMS.length * 20 + SPECIAL.reduce((a, s) => a + s.count, 0);
     const GC = { A: "#e63946", B: "#2196f3", C: "#4caf50", D: "#ff9800", E: "#9c27b0", F: "#00bcd4", G: "#f06292", H: "#8bc34a", I: "#ff5722", J: "#3f51b5", K: "#009688", L: "#ffc107" };
     const AVATARS = ["⚽", "🏆", "🌟", "🦁", "🐯", "🦅", "🔥", "💎", "🏅", "⚡", "🎯", "🦊", "🐉", "🎪", "🚀", "🌙"];
-    const PHONE_CODES = [
-      { code: "+506", flag: "🇨🇷", label: "Costa Rica" },
-      { code: "+54", flag: "🇦🇷", label: "Argentina" },
-      { code: "+1", flag: "🇺🇸", label: "Estados Unidos" },
-      { code: "+52", flag: "🇲🇽", label: "México" },
-      { code: "+57", flag: "🇨🇴", label: "Colombia" },
-      { code: "+55", flag: "🇧🇷", label: "Brasil" },
-      { code: "+56", flag: "🇨🇱", label: "Chile" },
-      { code: "+58", flag: "🇻🇪", label: "Venezuela" },
-      { code: "+34", flag: "🇪🇸", label: "España" },
-      { code: "+44", flag: "🇬🇧", label: "Reino Unido" },
-      { code: "+33", flag: "🇫🇷", label: "Francia" },
-      { code: "+593", flag: "🇪🇨", label: "Ecuador" },
-      { code: "+507", flag: "🇵🇦", label: "Panamá" },
-      { code: "+591", flag: "🇧🇴", label: "Bolivia" },
-      { code: "+502", flag: "🇬🇹", label: "Guatemala" },
-      { code: "+505", flag: "🇳🇮", label: "Nicaragua" },
-      { code: "+51", flag: "🇵🇪", label: "Perú" },
-    ];
 
     // ══════════════════════════════════════════
     // SUPABASE API
@@ -252,7 +233,7 @@
       const [view, setView] = useState("list");
       const [selUser, setSelU] = useState(null);
       const [pin, setPin] = useState("");
-      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", phoneCode: "+506", phoneNumber: "", pin: "" });
+      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", phone: "", pin: "" });
       const [pinStep, setPinStep] = useState(1);
       const [err, setErr] = useState("");
       const [loading, setLoad] = useState(false);
@@ -293,11 +274,11 @@
       };
 
       const handleReg1 = () => {
-        const phoneNumber = form.phoneNumber.trim();
+        const phone = form.phone.trim();
         if (!form.email.includes("@")) { setErr("Email inválido"); return; }
         if (!form.name.trim()) { setErr("Ingresá tu nombre"); return; }
-        if (!phoneNumber) { setErr("Ingresá tu teléfono con código de país"); return; }
-        if (!/^\+\d[\d\s\-()]{6,}$/.test(`${form.phoneCode} ${phoneNumber}`)) { setErr("Teléfono inválido. Incluí +Código"); return; }
+        if (!phone) { setErr("Ingresá tu teléfono con código de país"); return; }
+        if (!/^\+\d[\d\s\-()]{6,}$/.test(phone)) { setErr("Teléfono inválido. Incluí +Código"); return; }
         if (localUsers.some(u => u.email.toLowerCase() === form.email.toLowerCase())) {
           setErr("Email ya registrado"); return;
         }
@@ -308,7 +289,7 @@
         if (pinStep === 1) { setForm(f => ({ ...f, pin: p })); setPinStep(2); setTimeout(() => setPin(""), 50); return; }
         if (p === form.pin) {
           setLoad(true);
-          const phoneValue = `${form.phoneCode} ${form.phoneNumber.trim()}`.trim();
+          const phoneValue = form.phone.trim();
           const data = await apiSignUp(form.email, form.pin, { name: form.name, avatar: form.avatar, phone: phoneValue });
           if (data.access_token) {
             await apiUpsertProfile(data.access_token, data.user.id, form.name, form.avatar);
@@ -326,7 +307,7 @@
             if (signIn.access_token) {
               await apiUpsertProfile(signIn.access_token, signIn.user.id, form.name, form.avatar);
               saveSess({ access_token: signIn.access_token, refresh_token: signIn.refresh_token, userId: signIn.user.id });
-              const phoneValue = `${form.phoneCode} ${form.phoneNumber.trim()}`.trim();
+              const phoneValue = form.phone.trim();
               const newU = { email: form.email, name: form.name, avatar: form.avatar, phone: phoneValue, userId: signIn.user.id };
               saveLocalU([...loadLocalU().filter(u => u.email !== form.email), newU]);
               const prog = await apiGetProgress(signIn.access_token, signIn.user.id);
@@ -445,14 +426,7 @@
                 </div>
                 <div style={{ marginBottom: 12 }}>
                   <span style={lbl}>TELÉFONO</span>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <select value={form.phoneCode} onChange={e => setForm(f => ({ ...f, phoneCode: e.target.value }))} style={{ ...inp, maxWidth: 120, paddingRight: 8 }}>
-                      {PHONE_CODES.map(country => (
-                        <option key={country.code} value={country.code}>{`${country.flag} ${country.code}`}</option>
-                      ))}
-                    </select>
-                    <input value={form.phoneNumber} onChange={e => setForm(f => ({ ...f, phoneNumber: e.target.value }))} placeholder="9 11 1234 5678" type="tel" style={{ ...inp, flex: 1 }} />
-                  </div>
+                  <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+54 9 11 1234 5678" type="tel" style={inp} />
                 </div>
                 <div style={{ marginBottom: 16 }}>
                   <span style={lbl}>EMAIL</span>
