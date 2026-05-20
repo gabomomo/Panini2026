@@ -530,7 +530,7 @@
       );
     }
 
-    function MissingListScreen({ owned, onClose }) {
+    function MissingListScreen({ owned, onToggle, onClose }) {
       const groups = GROUPS.map(group => {
         const teams = group.teams.map(team => {
           const missing = Array.from({ length: 20 }, (_, i) => `${team.id}${i + 1}`).filter(key => !owned[key]);
@@ -555,6 +555,7 @@
               <div style={{ fontSize: 10, letterSpacing: 3, color: "#f72585", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700 }}>LISTADO COMPLETO</div>
               <h2 style={{ margin: "8px 0 0", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 22 }}>Faltantes por equipo y grupo</h2>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 6 }}>{totalMissing} stickers faltantes</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 6 }}>Tocá un sticker faltante para marcarlo como adquirido.</div>
             </div>
           </div>
           <div style={{ maxWidth: 700, margin: "0 auto", padding: "20px 14px", display: "grid", gap: 16 }}>
@@ -576,7 +577,9 @@
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                         {team.missing.map(code => (
-                          <div key={code} style={{ fontSize: 11, padding: "6px 10px", borderRadius: 999, background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Barlow Condensed',sans-serif" }}>{code}</div>
+                          <button key={code} onClick={() => onToggle(code)} style={{ fontSize: 11, padding: "6px 10px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", cursor: "pointer", transition: "transform .12s, background .12s", minWidth: 58, textAlign: "center" }}>
+                            {code}
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -597,7 +600,9 @@
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                         {section.missing.map(code => (
-                          <div key={code} style={{ fontSize: 11, padding: "6px 10px", borderRadius: 999, background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Barlow Condensed',sans-serif" }}>{code}</div>
+                          <button key={code} onClick={() => onToggle(code)} style={{ fontSize: 11, padding: "6px 10px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.08)", color: "#fff", fontFamily: "'Barlow Condensed',sans-serif", cursor: "pointer", transition: "transform .12s, background .12s", minWidth: 58, textAlign: "center" }}>
+                            {code}
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -758,7 +763,7 @@
       const chip = (active, color = "#f72585") => ({ padding: "5px 14px", borderRadius: 999, border: `1px solid ${active ? color : "rgba(255,255,255,0.1)"}`, background: active ? color : "transparent", color: active ? "#fff" : "rgba(255,255,255,0.45)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: .5, whiteSpace: "nowrap", flexShrink: 0 });
 
       if (screen === "ranking") return <RankingScreen userId={userId} token={token} onClose={() => setScreen("main")} />;
-      if (screen === "missing") return <MissingListScreen owned={owned} onClose={() => setScreen("main")} />;
+      if (screen === "missing") return <MissingListScreen owned={owned} onToggle={toggle} onClose={() => setScreen("main")} />;
 
       return (
         <div style={{ background: "#0d0d1a", minHeight: "100vh", paddingBottom: 50 }}>
