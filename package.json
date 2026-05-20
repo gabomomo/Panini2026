@@ -1,29 +1,29 @@
 {
-  "name": "panini-2026-tracker",
-  "version": "1.0.0",
-  "description": "Panini FIFA World Cup 2026 Figuritas Tracker - Track and collect stickers with real-time sync",
-  "main": "panini-2026.html",
-  "scripts": {
-    "serve": "npx http-server",
-    "dev": "npx http-server -p 8000 -c-1"
-  },
-  "keywords": [
-    "panini",
-    "fifa",
-    "world-cup",
-    "2026",
-    "stickers",
-    "tracker",
-    "react",
-    "supabase"
-  ],
-  "author": "Panini 2026 Team",
-  "license": "PRIVATE",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-org/panini-2026-tracker.git"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  }
+    "name": "panini-2026-tracker",
+    "version": "1.0.0",
+    "description": "Panini FIFA World Cup 2026 Figuritas Tracker - Track and collect stickers with real-time sync",
+    "main": "panini-2026.html",
+    "scripts": {
+        "serve": "npx http-server",
+        "dev": "npx http-server -p 8000 -c-1"
+    },
+    "keywords": [
+        "panini",
+        "fifa",
+        "world-cup",
+        "2026",
+        "stickers",
+        "tracker",
+        "react",
+        "supabase"
+    ],
+    "author": "Panini 2026 Team",
+    "license": "PRIVATE",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gabomomo/Panini2026.git"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
 }
