@@ -117,6 +117,7 @@
     const GC = { A: "#e63946", B: "#2196f3", C: "#4caf50", D: "#ff9800", E: "#9c27b0", F: "#00bcd4", G: "#f06292", H: "#8bc34a", I: "#ff5722", J: "#3f51b5", K: "#009688", L: "#ffc107" };
     const AVATARS = ["⚽", "🏆", "🌟", "🦁", "🐯", "🦅", "🔥", "💎", "🏅", "⚡", "🎯", "🦊", "🐉", "🎪", "🚀", "🌙"];
     const PHONE_CODES = [
+      { code: "+506", flag: "🇨🇷", label: "Costa Rica" },
       { code: "+54", flag: "🇦🇷", label: "Argentina" },
       { code: "+1", flag: "🇺🇸", label: "Estados Unidos" },
       { code: "+52", flag: "🇲🇽", label: "México" },
@@ -127,6 +128,12 @@
       { code: "+34", flag: "🇪🇸", label: "España" },
       { code: "+44", flag: "🇬🇧", label: "Reino Unido" },
       { code: "+33", flag: "🇫🇷", label: "Francia" },
+      { code: "+593", flag: "🇪🇨", label: "Ecuador" },
+      { code: "+507", flag: "🇵🇦", label: "Panamá" },
+      { code: "+591", flag: "🇧🇴", label: "Bolivia" },
+      { code: "+502", flag: "🇬🇹", label: "Guatemala" },
+      { code: "+505", flag: "🇳🇮", label: "Nicaragua" },
+      { code: "+51", flag: "🇵🇪", label: "Perú" },
     ];
 
     // ══════════════════════════════════════════
@@ -245,7 +252,7 @@
       const [view, setView] = useState("list");
       const [selUser, setSelU] = useState(null);
       const [pin, setPin] = useState("");
-      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", phoneCode: "+54", phoneNumber: "", pin: "" });
+      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", phoneCode: "+506", phoneNumber: "", pin: "" });
       const [pinStep, setPinStep] = useState(1);
       const [err, setErr] = useState("");
       const [loading, setLoad] = useState(false);
