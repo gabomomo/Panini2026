@@ -41,11 +41,11 @@ cd panini-2026-tracker
 
 # Abrir en navegador
 # Opción 1: Directamente
-open panini-2026.html
+open index.html
 
 # Opción 2: Servidor local
 python -m http.server 8000
-# Accede a http://localhost:8000/panini-2026.html
+# Accede a http://localhost:8000/index.html
 ```
 
 ## 4. Futuros cambios
@@ -61,7 +61,7 @@ git push
 
 ```
 panini-2026-tracker/
-├── panini-2026.html       # Aplicación principal
+├── index.html       # Aplicación principal
 ├── README.md              # Documentación
 ├── package.json           # Metadatos del proyecto
 ├── .gitignore             # Archivos a ignorar en Git

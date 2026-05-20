@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# Panini2026
-Panini ALbum Sticker Tracker
-=======
 # Panini FIFA World Cup 2026 - Tracker
 
 Aplicación web para rastrear y coleccionar figuritas del álbum oficial de Panini para la Copa Mundial FIFA 2026.
@@ -9,7 +5,7 @@ Aplicación web para rastrear y coleccionar figuritas del álbum oficial de Pani
 ## 🎯 Características
 
 - ✅ Registro e inicio de sesión con PIN de 4 dígitos
-- 📊 Seguimiento de figuras por grupo, equipo y secciones especiales
+- 📊 Seguimiento de figuritas por grupo, equipo y secciones especiales
 - 🏆 Ranking global de coleccionistas
 - 📋 Vista de faltantes completa por equipo y grupo
 - 💾 Sincronización automática en Supabase
@@ -18,10 +14,10 @@ Aplicación web para rastrear y coleccionar figuritas del álbum oficial de Pani
 ## 🚀 Inicio rápido
 
 ### Opción 1: Usar directamente en el navegador
-Simplemente abre `panini-2026.html` en tu navegador:
+Simplemente abre `index.html` en tu navegador:
 ```bash
 # En macOS
-open panini-2026.html
+open index.html
 
 # O arrastra el archivo al navegador
 ```
@@ -31,13 +27,10 @@ open panini-2026.html
 # Con Python 3
 python -m http.server 8000
 
-# Con Python 2
-python -m SimpleHTTPServer 8000
-
 # Con Node + http-server
 npx http-server
 ```
-Luego accede a `http://localhost:8000/panini-2026.html`
+Luego accede a `http://localhost:8000/index.html`
 
 ## 📋 Requisitos
 
@@ -55,9 +48,11 @@ Luego accede a `http://localhost:8000/panini-2026.html`
 
 ```
 panini-2026/
-├── panini-2026.html   # Aplicación completa (monolítica con React)
-├── .gitignore         # Configuración de Git
-└── README.md          # Este archivo
+├── index.html        # Aplicación principal
+├── .gitignore        # Configuración de Git
+├── package.json      # Metadatos del proyecto
+├── README.md         # Documentación
+└── DEPLOY.md         # Instrucciones de despliegue
 ```
 
 ## 🛠️ Tecnologías
@@ -79,7 +74,7 @@ panini-2026/
 
 La app ya viene configurada con credenciales de Supabase. Si necesitas cambiar el proyecto:
 
-1. Abre `panini-2026.html`
+1. Abre `index.html`
 2. Busca las líneas:
    ```javascript
    const SB   = "https://lzkkobgdtzfxfcbhvjzj.supabase.co";
@@ -89,26 +84,11 @@ La app ya viene configurada con credenciales de Supabase. Si necesitas cambiar e
 
 ## 📱 Funcionalidades principales
 
-### Auth Screen
-- Lista de usuarios registrados localmente
-- Registro de nuevas cuentas
-- Inicio de sesión con email + PIN
-
-### Tracker Principal
-- Vista por grupos (A–L)
-- Vista por equipos
-- Búsqueda de equipos
-- Marcado de figuras individuales
-
-### Ranking
-- Tabla global de coleccionistas
-- Ordenado por cantidad de figuras
-- Muestra progreso en porcentaje
-
-### Lista de Faltantes
-- Resumen completo de faltantes
-- Agrupado por grupo y equipo
-- Códigos de figuras individuales
+- Registro e inicio de sesión con email + PIN
+- Vista de seguimiento por grupos y equipos
+- Búsqueda de equipos y figuritas
+- Lista de faltantes organizada por grupo/equipo
+- Ranking global de coleccionistas
 
 ## 💾 Almacenamiento
 
@@ -140,8 +120,3 @@ Privado - Uso exclusivo
 ## 👤 Autor
 
 Panini 2026 Tracker v1.0
-
----
-
-Para más información o reportar bugs, contacta al equipo de desarrollo.
->>>>>>> 9591090 (Initial commit: Panini 2026 Tracker application)
