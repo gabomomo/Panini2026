@@ -233,7 +233,7 @@
       const [view, setView] = useState("list");
       const [selUser, setSelU] = useState(null);
       const [pin, setPin] = useState("");
-      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", pin: "" });
+      const [form, setForm] = useState({ email: "", name: "", avatar: "⚽", phone: "", pin: "" });
       const [pinStep, setPinStep] = useState(1);
       const [err, setErr] = useState("");
       const [loading, setLoad] = useState(false);
@@ -276,6 +276,8 @@
       const handleReg1 = () => {
         if (!form.email.includes("@")) { setErr("Email inválido"); return; }
         if (!form.name.trim()) { setErr("Ingresá tu nombre"); return; }
+        if (!form.phone.trim()) { setErr("Ingresá tu teléfono con código de país"); return; }
+        if (!/^\+\d[\d\s\-()]{6,}$/.test(form.phone.trim())) { setErr("Teléfono inválido. Incluí +Código"); return; }
         if (localUsers.some(u => u.email.toLowerCase() === form.email.toLowerCase())) {
           setErr("Email ya registrado"); return;
         }
@@ -286,11 +288,11 @@
         if (pinStep === 1) { setForm(f => ({ ...f, pin: p })); setPinStep(2); setTimeout(() => setPin(""), 50); return; }
         if (p === form.pin) {
           setLoad(true);
-          const data = await apiSignUp(form.email, form.pin, { name: form.name, avatar: form.avatar });
+          const data = await apiSignUp(form.email, form.pin, { name: form.name, avatar: form.avatar, phone: form.phone });
           if (data.access_token) {
             await apiUpsertProfile(data.access_token, data.user.id, form.name, form.avatar);
             saveSess({ access_token: data.access_token, refresh_token: data.refresh_token, userId: data.user.id });
-            const newU = { email: form.email, name: form.name, avatar: form.avatar, userId: data.user.id };
+            const newU = { email: form.email, name: form.name, avatar: form.avatar, phone: form.phone, userId: data.user.id };
             saveLocalU([...loadLocalU().filter(u => u.email !== form.email), newU]);
             const prog = await apiGetProgress(data.access_token, data.user.id);
             setLoad(false);
@@ -303,7 +305,7 @@
             if (signIn.access_token) {
               await apiUpsertProfile(signIn.access_token, signIn.user.id, form.name, form.avatar);
               saveSess({ access_token: signIn.access_token, refresh_token: signIn.refresh_token, userId: signIn.user.id });
-              const newU = { email: form.email, name: form.name, avatar: form.avatar, userId: signIn.user.id };
+              const newU = { email: form.email, name: form.name, avatar: form.avatar, phone: form.phone, userId: signIn.user.id };
               saveLocalU([...loadLocalU().filter(u => u.email !== form.email), newU]);
               const prog = await apiGetProgress(signIn.access_token, signIn.user.id);
               onLogin(newU, signIn.access_token, signIn.refresh_token, signIn.user.id, prog?.[0]?.owned || {});
@@ -358,6 +360,7 @@
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif" }}>{u.name}</div>
                         <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>{u.email}</div>
+                        {u.phone && <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{u.phone}</div>}
                       </div>
                       <span style={{ marginLeft: "auto", color: "rgba(255,255,255,0.25)", fontSize: 20 }}>›</span>
                     </button>
@@ -367,7 +370,7 @@
                   style={{ width: "100%", padding: "12px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.05)", color: "#fff", fontWeight: 700, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, cursor: "pointer", letterSpacing: 1, marginBottom: 10 }}>
                   INICIAR SESIÓN
                 </button>
-                <button onClick={() => { setForm({ email: "", name: "", avatar: "⚽", pin: "" }); setErr(""); setView("reg1"); }}
+                <button onClick={() => { setForm({ email: "", name: "", avatar: "⚽", phone: "", pin: "" }); setErr(""); setView("reg1"); }}
                   style={{ width: "100%", padding: "12px", borderRadius: 12, border: "1px dashed rgba(247,37,133,0.4)", background: "rgba(247,37,133,0.06)", color: "#f72585", fontWeight: 700, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, cursor: "pointer", letterSpacing: 1 }}>
                   + CREAR CUENTA
                 </button>
@@ -417,6 +420,10 @@
                 <div style={{ marginBottom: 12 }}>
                   <span style={lbl}>NOMBRE</span>
                   <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Tu nombre..." maxLength={24} style={inp} />
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <span style={lbl}>TELÉFONO</span>
+                  <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+54 9 11 1234 5678" type="tel" style={inp} />
                 </div>
                 <div style={{ marginBottom: 16 }}>
                   <span style={lbl}>EMAIL</span>
