@@ -148,6 +148,9 @@
     const clearSess = () => { try { localStorage.removeItem(SK); } catch { } };
     const loadLocalU = () => { try { const v = localStorage.getItem(UK); return v ? JSON.parse(v) : []; } catch { return []; } };
     const saveLocalU = (u) => { try { localStorage.setItem(UK, JSON.stringify(u)); } catch { } };
+    const INSTALL_KEY = "p26i";
+    const loadInstallTips = () => { try { return localStorage.getItem(INSTALL_KEY) !== "1"; } catch { return true; } };
+    const saveInstallTips = () => { try { localStorage.setItem(INSTALL_KEY, "1"); } catch { } };
 
     // ══════════════════════════════════════════
     // UI ATOMS
@@ -161,6 +164,36 @@
     const Spin = () => (
       <div style={{ background: "#0d0d1a", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ width: 40, height: 40, border: "3px solid rgba(247,37,133,0.2)", borderTop: "3px solid #f72585", borderRadius: "50%", animation: "spin .8s linear infinite" }} />
+      </div>
+    );
+
+    const InstallTip = ({ onClose }) => (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div style={{ width: "100%", maxWidth: 540, background: "#0f172a", borderRadius: 24, border: "1px solid rgba(255,255,255,0.08)", padding: 24, boxShadow: "0 32px 120px rgba(0,0,0,0.45)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18, gap: 14 }}>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 0.4, marginBottom: 6 }}>Guardar la app en el inicio</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>Sigue estos pasos para abrir esta app rápido desde tu dispositivo.</div>
+            </div>
+            <button onClick={onClose} style={{ border: "none", background: "transparent", color: "#fff", fontSize: 26, cursor: "pointer", lineHeight: 1 }}>×</button>
+          </div>
+          <div style={{ display: "grid", gap: 16, fontSize: 14, color: "#e2e8f0", lineHeight: 1.7 }}>
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 16 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Android / Chrome</div>
+              Abre el menú del navegador (⋮) y elige <strong style={{ color: "#f72585" }}>Agregar a pantalla de inicio</strong>.
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 16 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>iPhone / Safari</div>
+              Toca el botón <strong style={{ color: "#f72585" }}>Compartir</strong> y luego selecciona <strong style={{ color: "#f72585" }}>Agregar a pantalla de inicio</strong>.
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 16, padding: 16 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Windows / Desktop</div>
+              Abre el menú del navegador y busca <strong style={{ color: "#f72585" }}>Instalar aplicación</strong> o <strong style={{ color: "#f72585" }}>Agregar acceso directo</strong>.
+            </div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", paddingTop: 4 }}>Esta ventana se mostrará solo una vez. Si prefieres verla después, cierra esta pantalla y sigue usando la app.</div>
+          </div>
+          <button onClick={onClose} style={{ marginTop: 22, width: "100%", padding: "14px 18px", borderRadius: 14, border: "none", background: "#f72585", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Entendido</button>
+        </div>
       </div>
     );
 
@@ -656,7 +689,7 @@
     // ══════════════════════════════════════════
     // MAIN TRACKER
     // ══════════════════════════════════════════
-    function Tracker({ user, token, userId, initialOwned, onLogout }) {
+    function Tracker({ user, token, userId, initialOwned, onLogout, onShowInstallTip }) {
       const [owned, setOwned] = useState(initialOwned || {});
       const [openTeam, setOpenT] = useState(null);
       const [openSpec, setOpenS] = useState(null);
@@ -704,6 +737,7 @@
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 7, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                  <button onClick={onShowInstallTip} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>📌 Guardar app</button>
                   <button onClick={() => setScreen("missing")} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>📋 Ver lista completa</button>
                   <button onClick={() => setScreen("ranking")} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#ffd60a", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>🏆 Ranking</button>
                   <button onClick={onLogout} style={{ padding: "6px 11px", borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif" }}>Salir</button>
@@ -779,6 +813,7 @@
     // ══════════════════════════════════════════
     function App() {
       const [state, setState] = useState({ status: "loading", user: null, token: null, userId: null, owned: {} });
+      const [showInstallTip, setShowInstallTip] = useState(() => loadInstallTips());
 
       useEffect(() => {
         const sess = loadSess();
@@ -804,10 +839,18 @@
         clearSess();
         setState({ status: "auth", user: null, token: null, userId: null, owned: {} });
       };
+      const dismissInstallTip = () => { saveInstallTips(); setShowInstallTip(false); };
+      const showInstallTipAgain = () => setShowInstallTip(true);
 
       if (state.status === "loading") return <Spin />;
-      if (state.status === "auth") return <AuthScreen onLogin={handleLogin} />;
-      return <Tracker user={state.user} token={state.token} userId={state.userId} initialOwned={state.owned} onLogout={handleLogout} />;
+      return (
+        <>
+          {showInstallTip && <InstallTip onClose={dismissInstallTip} />}
+          {state.status === "auth"
+            ? <AuthScreen onLogin={handleLogin} />
+            : <Tracker user={state.user} token={state.token} userId={state.userId} initialOwned={state.owned} onLogout={handleLogout} onShowInstallTip={showInstallTipAgain} />}
+        </>
+      );
     }
 
     ReactDOM.createRoot(document.getElementById("root")).render(<App />);
