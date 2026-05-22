@@ -142,12 +142,14 @@
     // ══════════════════════════════════════════
     // SESSION (localStorage — funciona en browser)
     // ══════════════════════════════════════════
-    const SK = "p26s", UK = "p26u";
+    const SK = "p26s", UK = "p26u", LP = "p26o";
     const loadSess = () => { try { const v = localStorage.getItem(SK); return v ? JSON.parse(v) : null; } catch { return null; } };
     const saveSess = (s) => { try { localStorage.setItem(SK, JSON.stringify(s)); } catch { } };
     const clearSess = () => { try { localStorage.removeItem(SK); } catch { } };
     const loadLocalU = () => { try { const v = localStorage.getItem(UK); return v ? JSON.parse(v) : []; } catch { return []; } };
     const saveLocalU = (u) => { try { localStorage.setItem(UK, JSON.stringify(u)); } catch { } };
+    const loadOwned = (uid) => { try { const v = localStorage.getItem(LP); const data = v ? JSON.parse(v) : {}; return data[uid] || {}; } catch { return {}; } };
+    const saveOwned = (uid, owned) => { try { const v = localStorage.getItem(LP); const data = v ? JSON.parse(v) : {}; data[uid] = owned; localStorage.setItem(LP, JSON.stringify(data)); } catch { } };
     const INSTALL_KEY = "p26i";
     const loadInstallTips = () => { try { return localStorage.getItem(INSTALL_KEY) !== "1"; } catch { return true; } };
     const saveInstallTips = () => { try { localStorage.setItem(INSTALL_KEY, "1"); } catch { } };
@@ -717,7 +719,8 @@
         setOwned(prev => {
           const next = { ...prev };
           if (next[key]) delete next[key]; else next[key] = 1;
-          apiUpsertProgress(token, userId, next);
+          saveOwned(userId, next);
+          apiUpsertProgress(token, userId, next).catch(() => { saveOwned(userId, next); });
           return next;
         });
       }, [token, userId]);
@@ -731,7 +734,7 @@
             headers: { ...H(token), Prefer: "resolution=merge-duplicates,return=minimal" },
             body: payload,
             keepalive: true,
-          }).catch(() => { });
+          }).catch(() => { saveOwned(userId, owned); });
         };
         window.addEventListener("beforeunload", flushProgress);
         return () => window.removeEventListener("beforeunload", flushProgress);
@@ -854,8 +857,14 @@
             const localUsers = loadLocalU();
             const u = localUsers.find(x => x.userId === sess.userId) || { name: "Usuario", avatar: "⚽" };
             const prog = await apiGetProgress(data.access_token, data.user.id);
+            const serverOwned = prog?.[0]?.owned || {};
+            const localOwned = loadOwned(data.user.id);
+            const finalOwned = Object.keys(serverOwned).length ? serverOwned : localOwned;
+            if (!Object.keys(serverOwned).length && Object.keys(localOwned).length) {
+              apiUpsertProgress(data.access_token, data.user.id, localOwned).catch(() => {});
+            }
             saveSess({ access_token: data.access_token, refresh_token: data.refresh_token, userId: data.user.id });
-            setState({ status: "app", user: { ...u, ...(data.user.user_metadata || {}) }, token: data.access_token, userId: data.user.id, owned: prog?.[0]?.owned || {} });
+            setState({ status: "app", user: { ...u, ...(data.user.user_metadata || {}) }, token: data.access_token, userId: data.user.id, owned: finalOwned });
           } else {
             clearSess(); setState(s => ({ ...s, status: "auth" }));
           }
@@ -863,7 +872,10 @@
       }, []);
 
       const handleLogin = (user, token, refreshToken, userId, owned) => {
-        setState({ status: "app", user, token, userId, owned });
+        const localOwned = loadOwned(userId);
+        const finalOwned = Object.keys(owned || {}).length ? owned : localOwned;
+        if (Object.keys(finalOwned).length) saveOwned(userId, finalOwned);
+        setState({ status: "app", user, token, userId, owned: finalOwned });
       };
       const handleLogout = () => {
         if (state.token) apiSignOut(state.token).catch(() => { });
