@@ -722,6 +722,21 @@
         });
       }, [token, userId]);
 
+      useEffect(() => {
+        const flushProgress = () => {
+          if (!token || !userId) return;
+          const payload = JSON.stringify({ user_id: userId, owned, updated_at: new Date().toISOString() });
+          fetch(`${SB}/rest/v1/sticker_progress`, {
+            method: "POST",
+            headers: { ...H(token), Prefer: "resolution=merge-duplicates,return=minimal" },
+            body: payload,
+            keepalive: true,
+          }).catch(() => { });
+        };
+        window.addEventListener("beforeunload", flushProgress);
+        return () => window.removeEventListener("beforeunload", flushProgress);
+      }, [owned, token, userId]);
+
       const totalOwned = Object.keys(owned).length;
       const pct = Math.round((totalOwned / TOTAL) * 100);
       const missing = TOTAL - totalOwned;
