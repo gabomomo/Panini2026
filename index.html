@@ -712,14 +712,12 @@
       const [activeG, setActiveG] = useState("Todos");
       const [tab, setTab] = useState("grupos");
       const [screen, setScreen] = useState("main");
-      const saveTimer = useRef(null);
 
       const toggle = useCallback((key) => {
         setOwned(prev => {
           const next = { ...prev };
           if (next[key]) delete next[key]; else next[key] = 1;
-          clearTimeout(saveTimer.current);
-          saveTimer.current = setTimeout(() => apiUpsertProgress(token, userId, next), 800);
+          apiUpsertProgress(token, userId, next);
           return next;
         });
       }, [token, userId]);
