@@ -134,7 +134,7 @@
     const apiSignOut = (tok) => fetch(`${SB}/auth/v1/logout`, { method: "POST", headers: H(tok) });
 
     const apiGetProgress = (tok, uid) => dbReq(`/sticker_progress?user_id=eq.${uid}&select=owned`, "GET", null, tok);
-    const apiUpsertProgress = (tok, uid, owned) => dbReq("/sticker_progress", "POST", { user_id: uid, owned, updated_at: new Date().toISOString() }, tok, { "Prefer": "resolution=merge-duplicates,return=minimal" });
+    const apiUpsertProgress = (tok, uid, owned) => dbReq(`/sticker_progress?on_conflict=user_id`, "POST", { user_id: uid, owned, updated_at: new Date().toISOString() }, tok, { "Prefer": "resolution=merge-duplicates,return=minimal" });
     const apiGetProfiles = (tok) => dbReq("/profiles?select=user_id,name,avatar", "GET", null, tok);
     const apiGetAllProgress = (tok) => dbReq("/sticker_progress?select=user_id,owned", "GET", null, tok);
     const apiUpsertProfile = (tok, uid, name, avatar) => dbReq("/profiles", "POST", { user_id: uid, name, avatar }, tok, { "Prefer": "resolution=merge-duplicates,return=minimal" });
@@ -861,7 +861,7 @@
             const localOwned = loadOwned(data.user.id);
             const finalOwned = Object.keys(serverOwned).length ? serverOwned : localOwned;
             if (!Object.keys(serverOwned).length && Object.keys(localOwned).length) {
-              apiUpsertProgress(data.access_token, data.user.id, localOwned).catch(() => {});
+              apiUpsertProgress(data.access_token, data.user.id, localOwned).catch(() => { });
             }
             saveSess({ access_token: data.access_token, refresh_token: data.refresh_token, userId: data.user.id });
             setState({ status: "app", user: { ...u, ...(data.user.user_metadata || {}) }, token: data.access_token, userId: data.user.id, owned: finalOwned });
