@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.4/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -108,8 +109,8 @@
       { id: "L", teams: [{ id: "ENG", name: "Inglaterra", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿" }, { id: "CRO", name: "Croacia", flag: "🇭🇷" }, { id: "GHA", name: "Ghana", flag: "🇬🇭" }, { id: "PAN", name: "Panamá", flag: "🇵🇦" }] },
     ];
     const SPECIAL = [
-      { id: "FWC", name: "Sección Especial / Introducción", count: 20, flag: "🌎" },
-      { id: "MUS", name: "FIFA Museum", count: 11, flag: "🏆" },
+      { id: "PAO", name: "Panini", count: 1, flag: "⭐" },
+      { id: "FWC", name: "Sección Especial / Introducción", count: 19, flag: "🌎" },
       { id: "COC", name: "Coca-Cola Exclusivos", count: 14, flag: "🥤" },
     ];
     const ALL_TEAMS = GROUPS.flatMap(g => g.teams);
@@ -506,7 +507,7 @@
       );
     }
 
-    function MissingListScreen({ owned, onToggle, onClose }) {
+    function MissingListScreen({ owned, onToggle, onClose, user }) {
       const groups = GROUPS.map(group => {
         const teams = group.teams.map(team => {
           const missing = Array.from({ length: 20 }, (_, i) => `${team.id}${i + 1}`).filter(key => !owned[key]);
@@ -523,6 +524,136 @@
       const totalMissing = groups.reduce((sum, group) => sum + group.teams.reduce((a, team) => a + team.missing.length, 0), 0)
         + special.reduce((sum, section) => sum + section.missing.length, 0);
 
+      const downloadPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const pageW = 210, pageH = 297, margin = 14;
+        const colW = (pageW - margin * 2) / 2;
+        let col = 0, y = 0;
+
+        const getX = () => margin + col * colW;
+        const newPage = () => { doc.addPage(); col = 0; y = 0; };
+        const checkY = (needed) => {
+          if (y + needed > pageH - margin) {
+            if (col === 0) { col = 1; y = 0; }
+            else newPage();
+          }
+        };
+
+        // Header primera página (ancho completo)
+        doc.setFillColor(13, 13, 26);
+        doc.rect(0, 0, pageW, 28, "F");
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(247, 37, 133);
+        doc.text("ÁLBUM PANINI · FIFA WORLD CUP 2026", pageW / 2, 11, { align: "center" });
+        doc.setFontSize(9);
+        doc.setTextColor(200, 200, 200);
+        const fecha = new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" });
+        doc.text(`${user?.name || "Coleccionista"} · ${totalMissing} stickers faltantes · ${fecha}`, pageW / 2, 19, { align: "center" });
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`${Object.keys(owned).length}/${TOTAL} stickers completados`, pageW / 2, 25, { align: "center" });
+
+        y = 34;
+
+        const groupColors = {
+          A:[230,57,70], B:[33,150,243], C:[76,175,80], D:[255,152,0],
+          E:[156,39,176], F:[0,188,212], G:[240,98,146], H:[139,195,74],
+          I:[255,87,34], J:[63,81,181], K:[0,150,136], L:[255,193,7]
+        };
+
+        groups.forEach(group => {
+          const groupData = GROUPS.find(g => g.id === group.id);
+          const gc = groupColors[group.id] || [150,150,150];
+          const totalGroupMissing = group.teams.reduce((s, t) => s + t.missing.length, 0);
+          const blockNeeded = 8 + group.teams.reduce((s, t) => s + 6 + Math.ceil(t.missing.length / 10) * 5, 0);
+          checkY(blockNeeded);
+          const x = getX();
+
+          // Cabecera del grupo
+          doc.setFillColor(...gc);
+          doc.roundedRect(x, y, colW - 4, 7, 2, 2, "F");
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(255, 255, 255);
+          doc.text(`GRUPO ${group.id}  ·  ${totalGroupMissing} faltantes`, x + 3, y + 5);
+          y += 9;
+
+          group.teams.forEach(team => {
+            checkY(10);
+            const tx = getX();
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(...gc);
+            doc.text(`${team.name}  (${team.missing.length})`, tx + 2, y + 4);
+            y += 6;
+
+            // Códigos en filas de 10
+            const rows = [];
+            for (let i = 0; i < team.missing.length; i += 10) rows.push(team.missing.slice(i, i + 10));
+            rows.forEach(row => {
+              checkY(5);
+              const rx = getX();
+              doc.setFontSize(7);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(60, 60, 60);
+              doc.text(row.join("  "), rx + 2, y + 3.5);
+              y += 5;
+            });
+            y += 1;
+          });
+          y += 4;
+        });
+
+        if (special.length > 0) {
+          checkY(12);
+          const x = getX();
+          doc.setFillColor(255, 214, 10);
+          doc.roundedRect(x, y, colW - 4, 7, 2, 2, "F");
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(30, 30, 30);
+          const totalSpecialMissing = special.reduce((s, sec) => s + sec.missing.length, 0);
+          doc.text(`ESPECIALES  ·  ${totalSpecialMissing} faltantes`, x + 3, y + 5);
+          y += 9;
+
+          special.forEach(section => {
+            checkY(10);
+            const tx = getX();
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(180, 140, 0);
+            doc.text(`${section.name}  (${section.missing.length})`, tx + 2, y + 4);
+            y += 6;
+
+            const rows = [];
+            for (let i = 0; i < section.missing.length; i += 10) rows.push(section.missing.slice(i, i + 10));
+            rows.forEach(row => {
+              checkY(5);
+              const rx = getX();
+              doc.setFontSize(7);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(60, 60, 60);
+              doc.text(row.join("  "), rx + 2, y + 3.5);
+              y += 5;
+            });
+            y += 1;
+          });
+        }
+
+        // Pie de página en todas las páginas
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(7);
+          doc.setTextColor(180, 180, 180);
+          doc.text(`Panini 2026 Tracker · Página ${i} de ${totalPages}`, pageW / 2, pageH - 6, { align: "center" });
+        }
+
+        doc.save(`faltantes-panini2026-${new Date().toISOString().slice(0,10)}.pdf`);
+      };
+
       return (
         <div style={{ background: "#0d0d1a", minHeight: "100vh", paddingBottom: 40 }}>
           <div style={{ background: "linear-gradient(160deg,#1a0a2e,#0d1535)", padding: "22px 20px 18px", borderBottom: "1px solid rgba(247,37,133,0.15)", position: "relative", minHeight: 120, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -532,6 +663,9 @@
               <h2 style={{ margin: "8px 0 0", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 22 }}>Faltantes por equipo y grupo</h2>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", marginTop: 6 }}>{totalMissing} stickers faltantes</div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 6 }}>Tocá un sticker faltante para marcarlo como adquirido.</div>
+              <button onClick={downloadPDF} disabled={totalMissing === 0} style={{ marginTop: 12, padding: "8px 20px", borderRadius: 10, border: "none", background: totalMissing === 0 ? "rgba(255,255,255,0.08)" : "#f72585", color: totalMissing === 0 ? "rgba(255,255,255,0.3)" : "#fff", fontWeight: 700, fontFamily: "'Barlow Condensed',sans-serif", fontSize: 13, cursor: totalMissing === 0 ? "default" : "pointer", letterSpacing: 1 }}>
+                📄 DESCARGAR PDF
+              </button>
             </div>
           </div>
           <div style={{ maxWidth: 700, margin: "0 auto", padding: "20px 14px", display: "grid", gap: 16 }}>
@@ -753,7 +887,7 @@
       const chip = (active, color = "#f72585") => ({ padding: "5px 14px", borderRadius: 999, border: `1px solid ${active ? color : "rgba(255,255,255,0.1)"}`, background: active ? color : "transparent", color: active ? "#fff" : "rgba(255,255,255,0.45)", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: .5, whiteSpace: "nowrap", flexShrink: 0 });
 
       if (screen === "ranking") return <RankingScreen userId={userId} token={token} onClose={() => setScreen("main")} />;
-      if (screen === "missing") return <MissingListScreen owned={owned} onToggle={toggle} onClose={() => setScreen("main")} />;
+      if (screen === "missing") return <MissingListScreen owned={owned} onToggle={toggle} onClose={() => setScreen("main")} user={user} />;
 
       return (
         <div style={{ background: "#0d0d1a", minHeight: "100vh", paddingBottom: 50 }}>
