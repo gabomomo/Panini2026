@@ -532,10 +532,11 @@
         let col = 0, y = 0;
 
         const getX = () => margin + col * colW;
-        const newPage = () => { doc.addPage(); col = 0; y = 0; };
+        let currentPage = 1;
+        const newPage = () => { doc.addPage(); col = 0; y = 0; currentPage++; };
         const checkY = (needed) => {
           if (y + needed > pageH - margin) {
-            if (col === 0) { col = 1; y = 0; }
+            if (col === 0) { col = 1; y = currentPage === 1 ? 34 : 0; }
             else newPage();
           }
         };
